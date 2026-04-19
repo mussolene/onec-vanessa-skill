@@ -1,0 +1,18 @@
+stages:
+  - smoke
+
+smoke-tests:
+  stage: smoke
+  tags:
+    - windows
+  script:
+    - copy .env.example .env
+    - pwsh -File skill/scripts/bootstrap.ps1 -SkipDoctor
+    - pwsh -File skill/scripts/doctor.ps1
+    - pwsh -File skill/scripts/run-ui.ps1 -Profile Smoke
+    - pwsh -File skill/scripts/run-xunit.ps1 -Profile Smoke
+  artifacts:
+    when: always
+    paths:
+      - artifacts/
+

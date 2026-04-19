@@ -1,0 +1,33 @@
+name: 1c-tests-example
+
+on:
+  workflow_dispatch:
+
+jobs:
+  smoke:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Prepare env
+        shell: pwsh
+        run: |
+          Copy-Item .env.example .env
+          Write-Host "Fill .env with your own secrets and paths before real use."
+      - name: Bootstrap
+        shell: pwsh
+        run: pwsh -File skill/scripts/bootstrap.ps1 -SkipDoctor
+      - name: Doctor
+        shell: pwsh
+        run: pwsh -File skill/scripts/doctor.ps1
+      - name: UI smoke
+        shell: pwsh
+        run: pwsh -File skill/scripts/run-ui.ps1 -Profile Smoke
+      - name: xUnit smoke
+        shell: pwsh
+        run: pwsh -File skill/scripts/run-xunit.ps1 -Profile Smoke
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: onec-test-artifacts
+          path: artifacts
+
