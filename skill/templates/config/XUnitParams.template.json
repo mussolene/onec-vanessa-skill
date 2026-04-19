@@ -1,0 +1,12 @@
+{
+  "$schema": "https://raw.githubusercontent.com/silverbulleters/vanessa-runner/develop/xunit-schema.json",
+  "default": {
+    "СтрогийПорядокВыполнения": false,
+    "ВыводитьСообщенияВЖурналРегистрации": true
+  },
+  "smoke": {
+    "СтрогийПорядокВыполнения": false,
+    "ВыводитьСообщенияВЖурналРегистрации": true
+  }
+}
+
