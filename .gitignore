@@ -22,6 +22,8 @@ artifacts/**/*
 # Common editor caches
 .idea/
 .vscode/
+__pycache__/
+*.pyc
 *.swp
 *.swo
 
@@ -34,4 +36,3 @@ artifacts/**/*
 *.epf.bak
 *.os
 .oscript_modules/
-
