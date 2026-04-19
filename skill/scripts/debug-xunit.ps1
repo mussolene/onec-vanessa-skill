@@ -4,7 +4,7 @@ param(
     [ValidateSet("Directory", "File", "Subsystem")]
     [string]$Loader = "Directory",
     [ValidateSet("Native", "VRunner")]
-    [string]$Backend = "VRunner",
+    [string]$Backend = "Native",
     [string]$EnvFile = ".env",
     [switch]$DryRun,
     [switch]$Help
@@ -95,4 +95,3 @@ Save-Json -Path (Join-Path $runPath "summary.json") -Value @{
 
 Write-Host "xUnit debug artifacts: $runPath"
 exit $statusCode
-
