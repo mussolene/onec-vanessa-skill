@@ -1,0 +1,37 @@
+.DS_Store
+Thumbs.db
+
+# Local environment
+.env
+.env.local
+.env.*.local
+
+# Build and packaging output
+dist/*
+!dist/.gitkeep
+
+# Runtime artifacts
+artifacts/*
+!artifacts/.gitkeep
+artifacts/**/*
+!artifacts/**/.gitkeep
+
+# Local generated configs
+.onec-test/
+
+# Common editor caches
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# 1C / OneScript transient files
+*.log
+*.tmp
+*.bak
+*.cf
+*.cfe
+*.epf.bak
+*.os
+.oscript_modules/
+
