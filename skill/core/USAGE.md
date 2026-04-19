@@ -68,6 +68,15 @@ Open debug-oriented run without shutdown:
 pwsh -File skill/scripts/debug-xunit.ps1 -TestsPath tests/xunit/Smoke
 ```
 
+## xUnit Naming Conventions
+
+- module file: `<Area>Tests.bsl`
+- suite file: `<Area>Suite.bsl`
+- test procedures: `Тест<Behavior>`
+- smoke modules live in a dedicated `Smoke/` folder when the repository uses smoke splits
+
+Keep names stable and boring. The goal is cheap targeting from scripts and CI, not clever naming.
+
 ## Optional vrunner Usage
 
 Use this only when the project already depends on `vanessa-runner`.
@@ -83,4 +92,3 @@ pwsh -File skill/scripts/run-xunit.ps1 -TestsPath tests/xunit/smoke -Backend VRu
 - Vanessa Automation status codes come from the exported status file when available;
 - xUnit direct mode treats the 1C process exit code as primary and records an additional status file when the wrapper backend provides one;
 - dry-run prints the exact command and generated paths without launching 1C.
-

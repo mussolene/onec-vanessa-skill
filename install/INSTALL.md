@@ -61,9 +61,16 @@ Recommended ignored local payload:
 - `artifacts/`
 - `dist/`
 
+## Adapting For Codex, Cursor, And Claude
+
+- Codex: point the agent to [../skill/adapters/codex/PROMPT.md](../skill/adapters/codex/PROMPT.md).
+- Cursor: point project rules to [../skill/adapters/cursor/RULES.md](../skill/adapters/cursor/RULES.md).
+- Claude: point the project guide to [../skill/adapters/claude/CLAUDE.md](../skill/adapters/claude/CLAUDE.md).
+
+All three adapters are intentionally thin and inherit behavior from [../skill/core/SKILL.md](../skill/core/SKILL.md).
+
 ## Upstream References
 
 - Vanessa Automation docs: [https://pr-mex.github.io/vanessa-automation/dev/](https://pr-mex.github.io/vanessa-automation/dev/)
 - xUnitFor1C repo/wiki: [https://github.com/xDrivenDevelopment/xUnitFor1C](https://github.com/xDrivenDevelopment/xUnitFor1C)
 - vanessa-runner repo: [https://github.com/vanessa-opensource/vanessa-runner](https://github.com/vanessa-opensource/vanessa-runner)
-
