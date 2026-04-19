@@ -2,66 +2,90 @@
 
 ## 1. Bootstrap
 
-```powershell
-pwsh -File skill/scripts/bootstrap.ps1
+```bash
+python3 skill/scripts/onec_test_cli.py bootstrap
 ```
 
 Then fill `.env` and rerun:
 
-```powershell
-pwsh -File skill/scripts/doctor.ps1
+```bash
+python3 skill/scripts/onec_test_cli.py doctor
 ```
 
 ## 2. Create The First UI Test
 
 Copy the template:
 
-```powershell
-Copy-Item skill/templates/ui/feature-template.feature tests/ui/smoke/open-form.feature
+```bash
+python3 - <<'PY'
+from pathlib import Path
+import shutil
+target = Path("tests/ui/smoke/open-form.feature")
+target.parent.mkdir(parents=True, exist_ok=True)
+shutil.copy2("skill/templates/ui/feature-template.feature", target)
+PY
 ```
 
 Or start from the example:
 
-```powershell
-Copy-Item examples/ui/smoke-open-form.feature tests/ui/smoke/open-form.feature
+```bash
+python3 - <<'PY'
+from pathlib import Path
+import shutil
+target = Path("tests/ui/smoke/open-form.feature")
+target.parent.mkdir(parents=True, exist_ok=True)
+shutil.copy2("examples/ui/smoke-open-form.feature", target)
+PY
 ```
 
 Run it:
 
-```powershell
-pwsh -File skill/scripts/run-ui.ps1 -FeaturePath tests/ui/smoke/open-form.feature
+```bash
+python3 skill/scripts/onec_test_cli.py run-ui --feature-path tests/ui/smoke/open-form.feature
 ```
 
 Debug it locally:
 
-```powershell
-pwsh -File skill/scripts/debug-ui.ps1 -FeaturePath tests/ui/smoke/open-form.feature
+```bash
+python3 skill/scripts/onec_test_cli.py debug-ui --feature-path tests/ui/smoke/open-form.feature
 ```
 
 ## 3. Create The First xUnit Test
 
 Copy the module template:
 
-```powershell
-Copy-Item skill/templates/xunit/test-module-template.bsl tests/xunit/Smoke/DocumentTests.bsl
+```bash
+python3 - <<'PY'
+from pathlib import Path
+import shutil
+target = Path("tests/xunit/Smoke/DocumentTests.bsl")
+target.parent.mkdir(parents=True, exist_ok=True)
+shutil.copy2("skill/templates/xunit/test-module-template.bsl", target)
+PY
 ```
 
 Or start from the example:
 
-```powershell
-Copy-Item examples/xunit/Smoke/SmokeMathTests.bsl tests/xunit/Smoke/SmokeMathTests.bsl
+```bash
+python3 - <<'PY'
+from pathlib import Path
+import shutil
+target = Path("tests/xunit/Smoke/SmokeMathTests.bsl")
+target.parent.mkdir(parents=True, exist_ok=True)
+shutil.copy2("examples/xunit/Smoke/SmokeMathTests.bsl", target)
+PY
 ```
 
 Run it:
 
-```powershell
-pwsh -File skill/scripts/run-xunit.ps1 -TestsPath tests/xunit/Smoke/SmokeMathTests.bsl -Loader File
+```bash
+python3 skill/scripts/onec_test_cli.py run-xunit --tests-path tests/xunit/Smoke/SmokeMathTests.bsl --loader File
 ```
 
 Debug it:
 
-```powershell
-pwsh -File skill/scripts/debug-xunit.ps1 -TestsPath tests/xunit/Smoke/SmokeMathTests.bsl -Loader File
+```bash
+python3 skill/scripts/onec_test_cli.py debug-xunit --tests-path tests/xunit/Smoke/SmokeMathTests.bsl --loader File
 ```
 
 ## 4. Read Artifacts
@@ -84,4 +108,3 @@ After each run, inspect:
 5. fix the test or product code;
 6. rerun the same file;
 7. expand to smoke or full scope only after the focused rerun passes.
-

@@ -9,7 +9,7 @@ Build a production-ready, minimal skill package for agent-driven 1C testing in C
 - `skill/core/` is the single source of truth.
 - `skill/adapters/` contains thin agent-specific wrappers that only translate core guidance.
 - `skill/templates/` contains reusable feature, xUnit, and config templates.
-- `skill/scripts/` contains Windows-first orchestration scripts for bootstrap, doctor, run, debug, artifact collection, and packaging.
+- `skill/scripts/` contains a cross-platform Python CLI for bootstrap, doctor, run, debug, artifact collection, and packaging, plus thin OS-specific wrappers.
 - `examples/` contains concrete smoke examples for UI and xUnit usage.
 - `install/` contains installation and quickstart instructions.
 - `ci/` contains example CI wiring, not mandatory live CI.
@@ -27,9 +27,9 @@ Build a production-ready, minimal skill package for agent-driven 1C testing in C
 
 ## Honest Platform Support
 
-- Windows: first-class for actual 1C execution, PowerShell scripts, Vanessa Automation, xUnitFor1C, and optional `vanessa-runner`.
-- macOS/Linux: supported only for repository-side tasks that do not require verified 1C execution, such as packaging, reading docs, copying templates, and the thin bootstrap shell wrapper.
-- Cross-platform claims stop where live 1C runtime verification stops.
+- The skill package itself is cross-platform because the orchestration layer is Python-based and does not depend on PowerShell.
+- Runtime execution uses the configured `OVS_1C_BIN` path and does not hardcode a Windows-only launcher.
+- Live 1C execution is still environment-dependent and must be validated on the actual OS/runtime combination used by the consuming team.
 
 ## Capability Split
 
@@ -55,7 +55,7 @@ Build a production-ready, minimal skill package for agent-driven 1C testing in C
 ## Risks And Limits
 
 - This environment cannot verify live 1C execution, so runtime correctness must be documented honestly and validated structurally.
-- `pwsh` is not available in the current workspace, so PowerShell verification is limited to static inspection and dry-run-oriented design.
+- `pwsh` is not available in the current workspace, so Windows wrappers are verified only as thin forwarders to the Python CLI.
 - xUnitFor1C usage differs across legacy versions; templates and docs will target the documented `xddTestRunner.epf` flow and state that version-specific adjustments may be required.
 - `vanessa-runner` examples must stay optional because the core skill cannot depend on extra runtime layers.
 
@@ -64,7 +64,6 @@ Build a production-ready, minimal skill package for agent-driven 1C testing in C
 1. Establish repo metadata and ignore rules.
 2. Write core architecture and usage documents.
 3. Add templates and smoke examples.
-4. Add PowerShell orchestration scripts plus thin shell bootstrap.
+4. Add a cross-platform Python orchestration CLI plus thin wrappers.
 5. Add install and CI example docs.
 6. Package evidence, run a fresh verification pass, and fix only proven gaps.
-

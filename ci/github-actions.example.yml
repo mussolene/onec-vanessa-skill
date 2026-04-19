@@ -4,30 +4,39 @@ on:
   workflow_dispatch:
 
 jobs:
+  repo-checks:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Bootstrap dry-run
+        run: python3 skill/scripts/onec_test_cli.py bootstrap --skip-doctor --dry-run
+      - name: Package dry-run
+        run: python3 skill/scripts/onec_test_cli.py package-skill --dry-run
+
   smoke:
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
       - name: Prepare env
-        shell: pwsh
         run: |
-          Copy-Item .env.example .env
-          Write-Host "Fill .env with your own secrets and paths before real use."
+          cp .env.example .env
+          echo "Fill .env with your own secrets and paths before real use."
       - name: Bootstrap
-        shell: pwsh
-        run: pwsh -File skill/scripts/bootstrap.ps1 -SkipDoctor
+        run: python skill/scripts/onec_test_cli.py bootstrap --skip-doctor
       - name: Doctor
-        shell: pwsh
-        run: pwsh -File skill/scripts/doctor.ps1
+        run: python skill/scripts/onec_test_cli.py doctor
       - name: UI smoke
-        shell: pwsh
-        run: pwsh -File skill/scripts/run-ui.ps1 -Profile Smoke
+        run: python skill/scripts/onec_test_cli.py run-ui --profile Smoke
       - name: xUnit smoke
-        shell: pwsh
-        run: pwsh -File skill/scripts/run-xunit.ps1 -Profile Smoke
+        run: python skill/scripts/onec_test_cli.py run-xunit --profile Smoke
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
           name: onec-test-artifacts
           path: artifacts
-

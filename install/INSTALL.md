@@ -4,7 +4,8 @@
 
 - core skill docs and adapters;
 - reusable templates;
-- Windows-first run/debug/bootstrap scripts;
+- cross-platform Python run/debug/bootstrap CLI;
+- thin PowerShell wrappers for Windows;
 - smoke examples;
 - CI wiring examples;
 - packaging script for reuse in another repository.
@@ -18,8 +19,9 @@ It does not ship:
 
 ## Honest Support Matrix
 
-- Windows: supported target for real 1C execution.
-- macOS/Linux: only repo-side tasks such as reading docs, copying templates, packaging, and the thin bootstrap wrapper are claimed here.
+- The skill package is cross-platform because the orchestration layer is Python-based.
+- The same CLI can be used on Windows, macOS, and Linux for bootstrap, doctor, packaging, config generation, and dry-run command assembly.
+- Actual 1C execution still depends on the consuming machine having a compatible 1C runtime and upstream tools installed.
 
 ## Prerequisites
 
@@ -39,9 +41,11 @@ Optional:
 ## Local Setup
 
 1. Copy this repository or vendor the `skill/`, `examples/`, `install/`, `ci/`, and `docs/` folders into your target repository.
-2. Run `pwsh -File skill/scripts/bootstrap.ps1`.
+2. Run `python3 skill/scripts/onec_test_cli.py bootstrap`.
 3. Fill `.env` with machine-specific paths and connection data.
-4. Run `pwsh -File skill/scripts/doctor.ps1`.
+4. Run `python3 skill/scripts/onec_test_cli.py doctor`.
+
+On Windows, `pwsh -File skill/scripts/<command>.ps1` remains available as a convenience wrapper.
 
 ## Embedding Into Another Repository
 

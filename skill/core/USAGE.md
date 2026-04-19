@@ -11,61 +11,70 @@
 
 ## Commands
 
-Windows-first entrypoints:
+Canonical cross-platform entrypoint:
+
+- `python3 skill/scripts/onec_test_cli.py bootstrap`
+- `python3 skill/scripts/onec_test_cli.py doctor`
+- `python3 skill/scripts/onec_test_cli.py run-ui --feature-path <path>`
+- `python3 skill/scripts/onec_test_cli.py debug-ui --feature-path <path>`
+- `python3 skill/scripts/onec_test_cli.py run-xunit --tests-path <path>`
+- `python3 skill/scripts/onec_test_cli.py debug-xunit --tests-path <path>`
+- `python3 skill/scripts/onec_test_cli.py collect-artifacts --run-path <path>`
+- `python3 skill/scripts/onec_test_cli.py package-skill`
+
+Windows convenience wrappers:
 
 - `pwsh -File skill/scripts/bootstrap.ps1`
 - `pwsh -File skill/scripts/doctor.ps1`
-- `pwsh -File skill/scripts/run-ui.ps1 -FeaturePath <path>`
-- `pwsh -File skill/scripts/debug-ui.ps1 -FeaturePath <path>`
-- `pwsh -File skill/scripts/run-xunit.ps1 -TestsPath <path>`
-- `pwsh -File skill/scripts/debug-xunit.ps1 -TestsPath <path>`
-- `pwsh -File skill/scripts/collect-artifacts.ps1 -RunPath <path>`
-- `pwsh -File skill/scripts/package-skill.ps1`
+- `pwsh -File skill/scripts/run-ui.ps1`
+- `pwsh -File skill/scripts/debug-ui.ps1`
+- `pwsh -File skill/scripts/run-xunit.ps1`
+- `pwsh -File skill/scripts/debug-xunit.ps1`
 
 ## UI Examples
 
 Run one feature:
 
-```powershell
-pwsh -File skill/scripts/run-ui.ps1 -FeaturePath tests/ui/smoke/open-form.feature
+```bash
+python3 skill/scripts/onec_test_cli.py run-ui --feature-path tests/ui/smoke/open-form.feature
 ```
 
 Run a feature directory:
 
-```powershell
-pwsh -File skill/scripts/run-ui.ps1 -FeaturePath tests/ui/smoke
+```bash
+python3 skill/scripts/onec_test_cli.py run-ui --feature-path tests/ui/smoke
 ```
 
 Run by tags:
 
-```powershell
-pwsh -File skill/scripts/run-ui.ps1 -FeaturePath tests/ui -Tags '@smoke,@api'
+```bash
+python3 skill/scripts/onec_test_cli.py run-ui --feature-path tests/ui --tags '@smoke,@api'
 ```
 
 Open local debug session without auto-run:
 
-```powershell
-pwsh -File skill/scripts/debug-ui.ps1 -FeaturePath tests/ui/smoke/open-form.feature
+```bash
+python3 skill/scripts/onec_test_cli.py debug-ui --feature-path tests/ui/smoke/open-form.feature
 ```
 
 ## xUnit Examples
 
 Run all xUnit tests in a folder:
 
-```powershell
-pwsh -File skill/scripts/run-xunit.ps1 -TestsPath tests/xunit
+```bash
+python3 skill/scripts/onec_test_cli.py run-xunit --tests-path tests/xunit
 ```
 
 Run one module:
 
-```powershell
-pwsh -File skill/scripts/run-xunit.ps1 -TestsPath tests/xunit/Smoke/DocumentPostingTests.bsl -Loader File
+```bash
+python3 skill/scripts/onec_test_cli.py run-xunit --tests-path tests/xunit/Smoke/DocumentPostingTests.bsl --loader File
 ```
 
 Open debug-oriented run without shutdown:
 
-```powershell
-pwsh -File skill/scripts/debug-xunit.ps1 -TestsPath tests/xunit/Smoke
+```bash
+python3 skill/scripts/onec_test_cli.py debug-xunit --tests-path tests/xunit/Smoke
 ```
 
 ## xUnit Naming Conventions
@@ -81,9 +90,9 @@ Keep names stable and boring. The goal is cheap targeting from scripts and CI, n
 
 Use this only when the project already depends on `vanessa-runner`.
 
-```powershell
-pwsh -File skill/scripts/run-ui.ps1 -FeaturePath tests/ui/smoke -Backend VRunner
-pwsh -File skill/scripts/run-xunit.ps1 -TestsPath tests/xunit/smoke -Backend VRunner
+```bash
+python3 skill/scripts/onec_test_cli.py run-ui --feature-path tests/ui/smoke --backend VRunner
+python3 skill/scripts/onec_test_cli.py run-xunit --tests-path tests/xunit/smoke --backend VRunner
 ```
 
 ## Exit Semantics

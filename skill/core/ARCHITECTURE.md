@@ -11,7 +11,7 @@ It does not define a new runtime, a new DSL, or a new test framework.
 - `skill/core/`: canonical behavior, strategy, usage, and troubleshooting.
 - `skill/adapters/`: thin agent-specific wrappers.
 - `skill/templates/`: reusable starter files and config templates.
-- `skill/scripts/`: Windows-first orchestration scripts and thin shell bootstrap.
+- `skill/scripts/`: cross-platform Python orchestration plus thin compatibility wrappers.
 - `examples/`: smoke examples with minimal real content.
 - `install/`: install and quickstart docs.
 - `ci/`: sample CI wiring.
@@ -27,6 +27,12 @@ It does not define a new runtime, a new DSL, or a new test framework.
 
 - primary: native `xddTestRunner.epf` command line;
 - optional: `vrunner xunit`.
+
+## CLI Layers
+
+- canonical layer: `skill/scripts/onec_test_cli.py`
+- Windows compatibility layer: `*.ps1` wrappers that only forward to the Python CLI
+- POSIX compatibility layer: `bootstrap.sh` plus direct `python3 ...` invocation
 
 ## Configuration Layers
 
@@ -69,4 +75,3 @@ Cursor, Codex, and Claude should share:
 - the same limitation notes.
 
 Agent-specific files should only express how that agent should consume the shared core.
-

@@ -1,18 +1,24 @@
 stages:
   - smoke
 
+repo_checks:
+  stage: smoke
+  image: python:3.11
+  script:
+    - python3 skill/scripts/onec_test_cli.py bootstrap --skip-doctor --dry-run
+    - python3 skill/scripts/onec_test_cli.py package-skill --dry-run
+
 smoke-tests:
   stage: smoke
   tags:
     - windows
   script:
     - copy .env.example .env
-    - pwsh -File skill/scripts/bootstrap.ps1 -SkipDoctor
-    - pwsh -File skill/scripts/doctor.ps1
-    - pwsh -File skill/scripts/run-ui.ps1 -Profile Smoke
-    - pwsh -File skill/scripts/run-xunit.ps1 -Profile Smoke
+    - python skill/scripts/onec_test_cli.py bootstrap --skip-doctor
+    - python skill/scripts/onec_test_cli.py doctor
+    - python skill/scripts/onec_test_cli.py run-ui --profile Smoke
+    - python skill/scripts/onec_test_cli.py run-xunit --profile Smoke
   artifacts:
     when: always
     paths:
       - artifacts/
-

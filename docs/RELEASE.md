@@ -2,18 +2,19 @@
 
 ## Release Checklist
 
-1. Run `bootstrap.ps1` and `doctor.ps1` on a Windows-ready machine.
-2. Confirm `.env.example` matches current script expectations.
-3. Confirm `skill/core/SKILL.md` is still the main entrypoint.
-4. Confirm examples open the expected local cycle.
-5. Confirm `package-skill.ps1` creates a distributable zip in `dist/`.
-6. Confirm `artifacts/` and local env files are not bundled accidentally.
-7. Prepare a short changelog and PR text.
+1. Run `python3 skill/scripts/onec_test_cli.py bootstrap --dry-run` on at least one non-Windows machine if you claim cross-platform repo-side support.
+2. Run `python3 skill/scripts/onec_test_cli.py doctor` on the target machine class used by the team.
+3. Confirm `.env.example` matches current script expectations.
+4. Confirm `skill/core/SKILL.md` is still the main entrypoint.
+5. Confirm examples open the expected local cycle.
+6. Confirm `python3 skill/scripts/onec_test_cli.py package-skill` creates a distributable zip in `dist/`.
+7. Confirm `artifacts/` and local env files are not bundled accidentally.
+8. Prepare a short changelog and PR text.
 
 ## Packaging
 
-```powershell
-pwsh -File skill/scripts/package-skill.ps1
+```bash
+python3 skill/scripts/onec_test_cli.py package-skill
 ```
 
 ## Push Policy
@@ -24,12 +25,12 @@ pwsh -File skill/scripts/package-skill.ps1
 ## Suggested PR Text
 
 ```
-Build a Windows-first 1C testing skill package for agent workflows.
+Build a cross-platform 1C testing skill package for agent workflows.
 
 - add core docs and thin adapters for Codex/Cursor/Claude
 - add Vanessa Automation and xUnitFor1C templates and smoke examples
-- add bootstrap/doctor/run/debug/artifact/package scripts
+- add cross-platform Python bootstrap/doctor/run/debug/artifact/package commands
+- keep PowerShell as a thin Windows wrapper, not the core runtime
 - add install, quickstart, release, and CI example docs
-- document honest platform limits and optional vanessa-runner usage
+- document honest runtime limits and optional vanessa-runner usage
 ```
-

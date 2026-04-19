@@ -69,7 +69,7 @@ Prefer xUnit first when it proves the same thing with less runtime cost and less
 
 - Do not invent commands, flags, loaders, APIs, or framework behavior.
 - Do not claim that `vanessa-runner` is required. It is optional here.
-- Do not claim Linux/macOS runtime support for 1C execution unless the path is explicitly verified.
+- Do not claim unverified OS/runtime combinations for actual 1C execution.
 - Do not hide missing infrastructure. State it clearly.
 - Do not merge UI and xUnit into one opaque command.
 - Do not create empty placeholder tests. Every stub must include a minimal executable intent.
@@ -102,11 +102,18 @@ Every non-trivial run should leave:
 
 Use `artifacts/` and keep paths stable enough for follow-up agent work.
 
+## Cross-Platform Contract
+
+- The skill orchestration layer is cross-platform and Python-based.
+- `skill/scripts/onec_test_cli.py` is the canonical entrypoint on macOS, Linux, and Windows.
+- PowerShell files are thin convenience wrappers for Windows users.
+- The agent should keep commands OS-agnostic where possible and use the configured `OVS_1C_BIN` path instead of hardcoded platform-specific launchers.
+
 ## Limitations
 
 - This skill ships orchestration, not vendor binaries.
 - Real execution requires a compatible 1C platform, test base, and upstream tools.
-- Windows is the only first-class runtime target claimed by this skill package.
+- The repo can orchestrate runs cross-platform, but actual 1C execution still depends on the OS/runtime combination installed by the consumer.
 
 ## Fast Links
 
@@ -116,4 +123,3 @@ Use `artifacts/` and keep paths stable enough for follow-up agent work.
 - [TROUBLESHOOTING.md](./TROUBLESHOOTING.md)
 - [../../install/INSTALL.md](../../install/INSTALL.md)
 - [../../install/QUICKSTART.md](../../install/QUICKSTART.md)
-
