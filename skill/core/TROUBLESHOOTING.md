@@ -38,6 +38,31 @@ Treat these as test or product failures:
 - check tag filters;
 - check whether the smoke convention path is mapped in `.env`.
 
+### TestManager starts but TestClient does not connect
+
+Typical signals:
+
+- Vanessa returns status `2`;
+- `ui-smoke.log` stops on the step that opens `TestClient`;
+- the second `1cv8` process exists, but the step ends with `Не смог подключить TestClient`.
+
+Check these in order:
+
+- close all previous 1C sessions, then retry the minimal smoke;
+- verify that the first smoke feature does only open/close `TestClient`;
+- compare the project `VAParams` with the installed ADD sample `VBParams*.json` files and keep the same key layout for client-launch settings;
+- inspect startup windows in the second client before assuming a step-definition problem;
+- remember that Vanessa steps cannot close startup windows before `TestClient` handshake is complete;
+- on Linux/container runs, verify that OS tools used by the configuration or its extensions actually exist, for example `ip`, `ping`, and the configured screenshot command;
+- if screenshots are enabled, verify the screenshot tool and output directory, or disable screenshots for the first smoke.
+
+If the environment is already launching both processes but still returns status `2`, document it as an infrastructure handshake problem first, not as a failing business scenario.
+
+Useful interpretation pattern:
+
+- if the log says `Прерывание по таймауту <25>` even though you configured a larger timeout, first suspect that ADD ignored your `VAParams` shape and fell back to bundled defaults;
+- if the timeout value changes after fixing the JSON layout, the config is now being read and you can continue debugging the real handshake or network problem.
+
 ## Common xUnit Problems
 
 ### Wrong loader
@@ -66,4 +91,3 @@ Be explicit:
 - Vanessa Automation docs: command-line launch, `VAParams`, return status, screenshots, debug loading.
 - xUnitFor1C docs: `xddTestRunner.epf`, command-line loaders, test module structure.
 - `vanessa-runner` docs: optional `vrunner vanessa` and `vrunner xunit` wrappers.
-

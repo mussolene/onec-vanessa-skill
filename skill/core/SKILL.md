@@ -83,6 +83,38 @@ Prefer xUnit first when it proves the same thing with less runtime cost and less
 - Local debug/load: open Vanessa Automation with `VAParams` loaded but without auto-run.
 - Optional wrapper: `vrunner vanessa`.
 
+### Containerized UI Smoke Contract
+
+When Vanessa runs inside a Linux container, keep the first proof deliberately narrow:
+
+1. Start with one `TestManager` session and no leftover 1C windows from previous runs.
+2. First prove only `TestManager -> TestClient` connection.
+3. Only after that add business-form steps.
+4. Treat startup windows in the second client as environment blockers, not as normal business steps.
+
+Mandatory checks for containerized UI smoke:
+
+- stable `artifacts/` paths for status, text log, allure, and cucumber output;
+- a minimal feature that only opens and closes `TestClient`;
+- a writable screenshot directory, or screenshots disabled on Linux if no screenshot tool is installed;
+- system tools expected by the tested configuration and its extensions, such as `ip` and `ping`, if startup code calls them;
+- a `VAParams` file that matches the real parser behavior of the installed Vanessa/ADD version;
+- one reproducible command that can be rerun without manual state repair.
+
+Optional but often useful:
+
+- external startup-window cleanup before `TestClient` handshake;
+- `vrunner vanessa` as a wrapper when the repo already depends on it;
+- a shell/runtime mode that does not auto-open the business base before the smoke run;
+- a separate smoke profile for file DB versus client-server DB.
+
+Practical rule for older or repo-pinned ADD builds:
+
+- do not assume nested JSON blocks like `КлиентТестирования` or `ВыполнениеСценариев` are honored;
+- verify the bundled sample `VBParams*.json` files from the installed ADD version first;
+- if the bundled samples keep `ТаймаутЗапуска1С`, `ДиапазонПортовTestclient`, or search/retry settings at the top level, mirror that exact shape in your project `VAParams`;
+- if you ignore this, the run may silently fall back to default ADD values, which often surfaces as `Не смог подключить TestClient` with a default timeout such as `25`.
+
 ### xUnitFor1C
 
 - Native source of truth: `xddTestRunner.epf` with `xddRun`, `xddReport`, and `xddShutdown`.
