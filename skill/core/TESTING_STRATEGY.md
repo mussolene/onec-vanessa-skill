@@ -62,6 +62,7 @@ The agent should always explain why it escalated.
 - for UI, use context/setup blocks and defensive cleanup;
 - for xUnit, keep fixtures cheap and isolated;
 - do not rely on a dirty shared base unless the repository already has a controlled convention for it.
+- for installer and migration UI tests, prefer a refreshed baseline database dump over scripted dismissal of startup/update reminders.
 
 ## UI Stability Rules
 
@@ -70,6 +71,7 @@ The agent should always explain why it escalated.
 - avoid brittle selectors when a stable field name exists;
 - separate setup, action, check, and cleanup;
 - capture screenshots and status consistently for failures.
+- for installation flows, assert durable postconditions in the base, not only the final visible page.
 
 ## xUnit Quality Rules
 
@@ -78,4 +80,3 @@ The agent should always explain why it escalated.
 - include both positive and negative cases where the branch matters;
 - reset local state in setup/teardown hooks when the framework version supports them;
 - use UI only when code-level proof is insufficient.
-

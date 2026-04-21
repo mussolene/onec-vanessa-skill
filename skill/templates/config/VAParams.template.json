@@ -15,6 +15,6 @@
   "ДелатьОтчетВФорматеCucumberJson": true,
   "КаталогOutputCucumberJson": "__ARTIFACT_DIR__/cucumber",
   "ДелатьОтчетВФорматеАллюр": true,
-  "КаталогOutputAllureБазовый": "__ARTIFACT_DIR__/allure"
+  "КаталогOutputAllureБазовый": "__ARTIFACT_DIR__/allure",
+  "ПриравниватьPendingКFailed": true
 }
-

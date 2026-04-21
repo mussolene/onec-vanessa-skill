@@ -63,6 +63,48 @@ Useful interpretation pattern:
 - if the log says `Прерывание по таймауту <25>` even though you configured a larger timeout, first suspect that ADD ignored your `VAParams` shape and fell back to bundled defaults;
 - if the timeout value changes after fixing the JSON layout, the config is now being read and you can continue debugging the real handshake or network problem.
 
+### Startup windows block scenario loading
+
+Typical signals:
+
+- the log prints technical information about Vanessa/ADD and then stops before the first feature line;
+- a visible 1C window asks to update the configuration, shows informational startup text, or waits for another modal decision;
+- killing or forcibly closing X11 windows makes the 1C process unstable.
+
+Preferred fix order:
+
+- refresh the baseline test database from an already updated dump, then rerun the scenario on a fresh copy of that base;
+- pass startup-suppression command-line switches such as `/DisableStartupMessages`, `/DisableStartupDialogs`, and `/DisableSplash` where the platform and runner support them;
+- keep first-smoke bases free of startup reminders and update prompts.
+
+Avoid treating this as a normal feature step. Vanessa cannot reliably close a modal startup window before the runner has loaded the scenario and connected the expected test context.
+
+### Custom Vanessa steps stay Pending
+
+Typical signals:
+
+- the scenario reaches the custom step and reports `Pending` or an empty snippet address;
+- built-in library steps execute normally;
+- the status file may still contain success if pending is not configured as failure.
+
+Check these in order:
+
+- set `ПриравниватьPendingКFailed` to true for CI and agent runs;
+- verify the step external processing exports `ПолучитьСписокТестов(КонтекстФреймворкаBDD)` from the form module expected by the ADD version in use;
+- declare the standard Vanessa context variables used by local examples, especially `Ванесса`, `Контекст`, and `КонтекстСохраняемый`;
+- keep snippet signatures valid and minimal, for example `ИмяШага(Параметр)`, without stale generated punctuation;
+- load external step processors using the same mechanism as the repository's existing ADD configuration, either library folders or the external-processings directory, but do not mix incompatible layouts in one run.
+
+### UI scenarios for installers
+
+Installer tests should prove three things separately:
+
+- the installer is opened through a user-visible UI path or a Vanessa UI step;
+- required user decisions are explicit steps, for example pressing an install or continue button only when the product flow needs it;
+- the final assertion checks persisted state in the test base, such as an installed extension, a registered external processing, or another durable artifact.
+
+Do not stop at checking that the installer form opened. A form-only assertion is a smoke of the launcher, not a proof that installation worked.
+
 ## Common xUnit Problems
 
 ### Wrong loader
