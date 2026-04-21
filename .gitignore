@@ -6,6 +6,13 @@ Thumbs.db
 .env.local
 .env.*.local
 
+# Local agent/proof-loop state
+.agent/
+.codex/
+.claude/
+AGENTS.md
+CLAUDE.md
+
 # Build and packaging output
 dist/*
 !dist/.gitkeep
