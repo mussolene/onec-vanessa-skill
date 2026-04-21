@@ -48,7 +48,7 @@ def ensure_directory(path: Path) -> Path:
 
 def new_run_context(category: str, name: str = "run") -> Path:
     root = ensure_directory(REPO_ROOT / "artifacts" / category)
-    run_id = f"{datetime.now().strftime('%Y%m%d-%H%M%S')}-{name}"
+    run_id = f"{datetime.now().strftime('%Y%m%d-%H%M%S-%f')}-{name}"
     return ensure_directory(root / run_id)
 
 
@@ -60,6 +60,51 @@ def save_text(path: Path, value: str) -> None:
 def save_json(path: Path, value: Any) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(value, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+
+
+def migrate_va_params_file(path: Path) -> None:
+    if not path.exists():
+        return
+
+    try:
+        config = json.loads(path.read_text(encoding="utf-8"))
+    except json.JSONDecodeError:
+        return
+
+    if not isinstance(config, dict):
+        return
+
+    changed = False
+    legacy_output_prefix = "Каталог" + "Output"
+    renamed_keys = {
+        f"{legacy_output_prefix}Скриншоты": "КаталогВыгрузкиСкриншотов",
+        f"{legacy_output_prefix}CucumberJson": "КаталогВыгрузкиCucumberJson",
+        f"{legacy_output_prefix}AllureБазовый": "КаталогВыгрузки AllureБазовый",
+    }
+    for old_key, new_key in renamed_keys.items():
+        if old_key in config:
+            if new_key not in config:
+                config[new_key] = config[old_key]
+            del config[old_key]
+            changed = True
+
+    if "ПриравниватьPendingКFailed" not in config:
+        config["ПриравниватьPendingКFailed"] = True
+        changed = True
+
+    screenshot_command = str(config.get("КомандаСделатьСкриншот", "") or "")
+    uses_addin_screenshots = bool(config.get("ИспользоватьВнешнююКомпонентуДляСкриншотов"))
+    if uses_addin_screenshots and not config.get("ИспользоватьКомпонентуVanessaExt"):
+        config["ИспользоватьКомпонентуVanessaExt"] = True
+        changed = True
+
+    screenshots_enabled = bool(config.get("ДелатьСкриншотПриВозникновенииОшибки"))
+    if screenshots_enabled and not screenshot_command and not uses_addin_screenshots:
+        config["ДелатьСкриншотПриВозникновенииОшибки"] = False
+        changed = True
+
+    if changed:
+        save_json(path, config)
 
 
 def repo_path(value: str) -> Path:
@@ -104,6 +149,23 @@ def resolve_loader(loader: str) -> str:
     return mapping[loader]
 
 
+def parse_bool(value: str) -> bool:
+    return value.strip().lower() in {"1", "true", "yes", "y", "истина", "да"}
+
+
+def build_enterprise_args(ib_connection: str, test_manager: bool = False) -> list[str]:
+    args = ["ENTERPRISE"]
+    if test_manager:
+        args.append("/TestManager")
+
+    if ib_connection.lstrip().startswith("/"):
+        args.extend(shlex.split(ib_connection))
+    else:
+        args.extend(["/IBConnectionString", ib_connection])
+
+    return args
+
+
 def command_exists(value: str) -> bool:
     return Path(value).exists() or shutil.which(value) is not None
 
@@ -142,6 +204,8 @@ def bootstrap(args: argparse.Namespace) -> int:
     xunit_target = local_config_root / "XUnitParams.local.json"
     if not ui_target.exists():
         shutil.copy2(SKILL_ROOT / "templates" / "config" / "VAParams.template.json", ui_target)
+    else:
+        migrate_va_params_file(ui_target)
     if not xunit_target.exists():
         shutil.copy2(SKILL_ROOT / "templates" / "config" / "XUnitParams.template.json", xunit_target)
 
@@ -211,21 +275,38 @@ def doctor(args: argparse.Namespace) -> int:
     return 2 if summary["failedRequired"] else 0
 
 
-def build_ui_va_config(feature_path: Path, libraries_path: Path, run_path: Path, tags: list[str] | None) -> dict[str, Any]:
+def build_ui_va_config(
+    feature_path: Path,
+    libraries_path: Path,
+    run_path: Path,
+    tags: list[str] | None,
+    env_map: dict[str, str],
+) -> dict[str, Any]:
+    screenshot_command = get_setting(env_map, "OVS_VA_SCREENSHOT_COMMAND")
+    use_addin_for_screenshots = parse_bool(get_setting(env_map, "OVS_VA_USE_ADDIN_FOR_SCREENSHOTS", default="false"))
+    screenshot_enabled = parse_bool(get_setting(env_map, "OVS_VA_ENABLE_SCREENSHOTS", default="false"))
+    enable_screenshots = screenshot_enabled or bool(screenshot_command) or use_addin_for_screenshots
+
     config: dict[str, Any] = {
         "КаталогФич": str(feature_path),
         "КаталогиБиблиотек": [str(libraries_path)],
-        "ДелатьСкриншотПриВозникновенииОшибки": True,
-        "КаталогOutputСкриншоты": str(run_path / "screenshots"),
+        "ДелатьСкриншотПриВозникновенииОшибки": enable_screenshots,
+        "КаталогВыгрузкиСкриншотов": str(run_path / "screenshots"),
         "ДелатьЛогВыполненияСценариевВТекстовыйФайл": True,
         "ИмяФайлаЛогВыполненияСценариев": str(run_path / "va.log"),
         "ВыгружатьСтатусВыполненияСценариевВФайл": True,
         "ПутьКФайлуДляВыгрузкиСтатусаВыполненияСценариев": str(run_path / "status.txt"),
         "ДелатьОтчетВФорматеCucumberJson": True,
-        "КаталогOutputCucumberJson": str(run_path / "cucumber"),
+        "КаталогВыгрузкиCucumberJson": str(run_path / "cucumber"),
         "ДелатьОтчетВФорматеАллюр": True,
-        "КаталогOutputAllureБазовый": str(run_path / "allure"),
+        "КаталогВыгрузки AllureБазовый": str(run_path / "allure"),
+        "ПриравниватьPendingКFailed": True,
     }
+    if screenshot_command:
+        config["КомандаСделатьСкриншот"] = screenshot_command
+    if use_addin_for_screenshots:
+        config["ИспользоватьКомпонентуVanessaExt"] = True
+        config["ИспользоватьВнешнююКомпонентуДляСкриншотов"] = True
     if tags:
         config["СписокТеговОтбор"] = tags
     return config
@@ -249,7 +330,7 @@ def run_ui(args: argparse.Namespace) -> int:
     command_path = run_path / "command.txt"
 
     tags = split_tags(args.tags)
-    save_json(config_path, build_ui_va_config(feature_path, libraries_path, run_path, tags))
+    save_json(config_path, build_ui_va_config(feature_path, libraries_path, run_path, tags, env_map))
 
     if args.backend == "Native":
         env_required = load_env(REPO_ROOT / args.env_file)
@@ -259,7 +340,7 @@ def run_ui(args: argparse.Namespace) -> int:
         password = get_setting(env_required, "OVS_DB_PASSWORD")
         vanessa = get_setting(env_required, "OVS_VANESSA_EPF", required=True)
 
-        command_args = ["ENTERPRISE", ib]
+        command_args = build_enterprise_args(ib, test_manager=True)
         if user:
             command_args.append(f"/N{user}")
         if password:
@@ -324,7 +405,7 @@ def debug_ui(args: argparse.Namespace) -> int:
     password = get_setting(env_map, "OVS_DB_PASSWORD")
     vanessa = get_setting(env_map, "OVS_VANESSA_EPF", required=True)
 
-    command_args = ["ENTERPRISE", ib]
+    command_args = build_enterprise_args(ib, test_manager=True)
     if user:
         command_args.append(f"/N{user}")
     if password:
@@ -383,7 +464,7 @@ def run_xunit(args: argparse.Namespace) -> int:
         loader_name = resolve_loader(args.loader)
         xdd = f'xddRun {loader_name} "{tests_path}";xddReport ГенераторОтчетаJUnitXML "{report_path}";xddShutdown;'
 
-        command_args = ["ENTERPRISE", ib]
+        command_args = build_enterprise_args(ib)
         if user:
             command_args.append(f"/N{user}")
         if password:
@@ -451,7 +532,7 @@ def debug_xunit(args: argparse.Namespace) -> int:
         loader_name = resolve_loader(args.loader)
         xdd = f'xddRun {loader_name} "{tests_path}";xddReport ГенераторОтчетаJUnitXML "{report_path}";'
 
-        command_args = ["ENTERPRISE", ib]
+        command_args = build_enterprise_args(ib)
         if user:
             command_args.append(f"/N{user}")
         if password:

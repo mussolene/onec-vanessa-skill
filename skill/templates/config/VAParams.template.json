@@ -6,15 +6,18 @@
   "СписокТеговОтбор": [
     "__TAGS__"
   ],
-  "ДелатьСкриншотПриВозникновенииОшибки": true,
-  "КаталогOutputСкриншоты": "__ARTIFACT_DIR__/screenshots",
+  "ДелатьСкриншотПриВозникновенииОшибки": false,
+  "ИспользоватьКомпонентуVanessaExt": false,
+  "ИспользоватьВнешнююКомпонентуДляСкриншотов": false,
+  "КаталогВыгрузкиСкриншотов": "__ARTIFACT_DIR__/screenshots",
+  "КомандаСделатьСкриншот": "__SCREENSHOT_COMMAND__",
   "ДелатьЛогВыполненияСценариевВТекстовыйФайл": true,
   "ИмяФайлаЛогВыполненияСценариев": "__ARTIFACT_DIR__/va.log",
   "ВыгружатьСтатусВыполненияСценариевВФайл": true,
   "ПутьКФайлуДляВыгрузкиСтатусаВыполненияСценариев": "__ARTIFACT_DIR__/status.txt",
   "ДелатьОтчетВФорматеCucumberJson": true,
-  "КаталогOutputCucumberJson": "__ARTIFACT_DIR__/cucumber",
+  "КаталогВыгрузкиCucumberJson": "__ARTIFACT_DIR__/cucumber",
   "ДелатьОтчетВФорматеАллюр": true,
-  "КаталогOutputAllureБазовый": "__ARTIFACT_DIR__/allure",
+  "КаталогВыгрузки AllureБазовый": "__ARTIFACT_DIR__/allure",
   "ПриравниватьPendingКFailed": true
 }

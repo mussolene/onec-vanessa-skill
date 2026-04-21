@@ -30,7 +30,7 @@ Required for real execution:
 - compatible 1C executable path;
 - Vanessa Automation EPF path;
 - xUnitFor1C `xddTestRunner.epf` path;
-- accessible test infobase connection;
+- accessible test infobase connection. If `OVS_IB_CONNECTION` is a plain connection string, the CLI passes it as `/IBConnectionString <value>`; if it already starts with a 1C command-line switch such as `/F` or `/IBConnectionString`, the CLI passes it as-is;
 - write access to the repository `artifacts/` directory.
 
 Optional:

@@ -135,3 +135,10 @@ python3 skill/scripts/onec_test_cli.py run-xunit --tests-path tests/xunit/smoke 
 - Vanessa Automation status codes come from the exported status file when available;
 - xUnit direct mode treats the 1C process exit code as primary and records an additional status file when the wrapper backend provides one;
 - dry-run prints the exact command and generated paths without launching 1C.
+
+## Vanessa Parameter Notes
+
+- The CLI uses documented VAParams keys from the current Vanessa Automation docs, including `КаталогВыгрузкиСкриншотов`, `КаталогВыгрузкиCucumberJson`, `КаталогВыгрузки AllureБазовый`, `ВыгружатьСтатусВыполненияСценариевВФайл`, and `ПриравниватьPendingКFailed`.
+- Screenshot capture is disabled by default unless `OVS_VA_ENABLE_SCREENSHOTS=true`, `OVS_VA_SCREENSHOT_COMMAND` is set, or `OVS_VA_USE_ADDIN_FOR_SCREENSHOTS=true`. When addin screenshots are enabled, the CLI also sets `ИспользоватьКомпонентуVanessaExt=true`; the installed runtime still must support VanessaExt.
+- Native UI runs add `/TestManager` and launch Vanessa with `StartFeaturePlayer;VAParams=<file>`.
+- Debug UI runs pass only `VAParams=<file>` so settings are loaded without automatic scenario execution.
