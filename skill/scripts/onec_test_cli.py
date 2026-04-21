@@ -34,6 +34,35 @@ def load_env(path: Path) -> dict[str, str]:
     return values
 
 
+def merge_env_template_file(target_path: Path, template_path: Path) -> None:
+    if not target_path.exists() or not template_path.exists():
+        return
+
+    target_lines = target_path.read_text(encoding="utf-8").splitlines()
+    existing_keys = {
+        line.split("=", 1)[0].strip()
+        for line in target_lines
+        if line.strip() and not line.strip().startswith("#") and "=" in line
+    }
+
+    additions: list[str] = []
+    for line in template_path.read_text(encoding="utf-8").splitlines():
+        stripped = line.strip()
+        if not stripped or stripped.startswith("#") or "=" not in stripped:
+            continue
+        key = line.split("=", 1)[0].strip()
+        if key not in existing_keys:
+            additions.append(line)
+            existing_keys.add(key)
+
+    if additions:
+        separator = "" if not target_lines or target_lines[-1] == "" else "\n"
+        target_path.write_text(
+            "\n".join(target_lines) + separator + "# Added by bootstrap from current template\n" + "\n".join(additions) + "\n",
+            encoding="utf-8",
+        )
+
+
 def get_setting(env_map: dict[str, str], name: str, default: str = "", required: bool = False) -> str:
     value = os.environ.get(name) or env_map.get(name) or default
     if required and not value:
@@ -199,6 +228,8 @@ def bootstrap(args: argparse.Namespace) -> int:
         shutil.copy2(SKILL_ROOT / "templates" / "config" / "env.template", env_example)
     if not env_target.exists():
         shutil.copy2(env_example, env_target)
+    else:
+        merge_env_template_file(env_target, env_example)
 
     ui_target = local_config_root / "VAParams.local.json"
     xunit_target = local_config_root / "XUnitParams.local.json"
@@ -605,6 +636,38 @@ def collect_artifacts(args: argparse.Namespace) -> int:
     return 0
 
 
+def should_package_path(path: Path) -> bool:
+    ignored_names = {".DS_Store", "Thumbs.db"}
+    ignored_dirs = {"__pycache__", ".pytest_cache", ".mypy_cache"}
+    ignored_suffixes = {".pyc", ".pyo", ".swp", ".swo"}
+
+    parts = set(path.parts)
+    if parts & ignored_dirs:
+        return False
+    if path.name in ignored_names:
+        return False
+    if path.suffix in ignored_suffixes:
+        return False
+    return True
+
+
+def copy_package_tree(source: Path, target: Path) -> None:
+    if source.is_dir():
+        for path in sorted(source.rglob("*")):
+            relative = path.relative_to(source)
+            if not should_package_path(relative):
+                continue
+            destination = target / relative
+            if path.is_dir():
+                destination.mkdir(parents=True, exist_ok=True)
+            elif path.is_file():
+                destination.parent.mkdir(parents=True, exist_ok=True)
+                shutil.copy2(path, destination)
+    elif should_package_path(source):
+        target.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(source, target)
+
+
 def package_skill(args: argparse.Namespace) -> int:
     dist_root = ensure_directory(REPO_ROOT / "dist")
     output_name = args.output_name or f"onec-vanessa-skill-{datetime.now().strftime('%Y%m%d-%H%M%S')}.zip"
@@ -632,11 +695,7 @@ def package_skill(args: argparse.Namespace) -> int:
             if not source.exists():
                 continue
             target = staging_root / relative
-            if source.is_dir():
-                shutil.copytree(source, target)
-            else:
-                target.parent.mkdir(parents=True, exist_ok=True)
-                shutil.copy2(source, target)
+            copy_package_tree(source, target)
 
         if destination.exists():
             destination.unlink()
